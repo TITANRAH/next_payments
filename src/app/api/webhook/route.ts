@@ -1,125 +1,61 @@
+import prisma from "@/libs/prisma";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import prisma from "@/libs/prisma";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
+// secreto key de cuenta stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-export async function POST(request: Request) {
-  const body = await request.text();
-  const sig = request.headers.get("stripe-signature");
+// poner revelar firma en la cuenta de strapi al crear el webhook
+const endpointSecret = "whsec_XNyHdwe9mI9CnFCq67ZXGA9ZI5Fs4PAd";
+
+export async function POST(req: Request) {
+  console.log("entro solito al webhook por config en stripe.com");
+  //   const sig = req.headers["stripe-signature"];
+  const body = await req.text();
+  const sig = req.headers.get("stripe-signature");
 
   if (!sig) {
     return NextResponse.json(
-      { "Webhook Error": "No signature" },
-      {
-        status: 400,
-      }
+      { "Webhook Error": "No Signature" },
+      { status: 400 }
     );
   }
-
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
-  } catch (err) {
-    return NextResponse.json(
-      { "Webhook Error": err.message },
-      {
-        status: 400,
-      }
-    );
+    event = stripe.webhooks.constructEvent(body, sig!, endpointSecret);
+  } catch (err: any) {
+    console.log("error------>", err);
+    return NextResponse.json({ "Webhook Error": err.message }, { status: 400 });
   }
 
   switch (event.type) {
     case "checkout.session.completed":
       const checkoutSessionCompleted = event.data.object;
-      if (checkoutSessionCompleted.mode === "payment") {
-        const userId = checkoutSessionCompleted.metadata.userId as string;
-        const productsIds = checkoutSessionCompleted.metadata.productsIds
-          .split(",")
-          .map((id) => parseInt(id));
+      // Then define and call a function to handle the event checkout.session.completed
 
-        const userFound = await prisma.user.findUnique({
-          where: {
-            id: parseInt(userId as string),
-          },
-          select: {
-            email: true,
-          },
-        });
+      console.log(
+        "info de switch check completed ->",
+        checkoutSessionCompleted
+      );
 
-        if (!userFound) {
-          return NextResponse.json(
-            { "Webhook Error": "User not found" },
-            {
-              status: 400,
-            }
-          );
-        }
+      // encuentra al usuario y actualiza su rol ya que pago ahora su rol es suscriptor no user 
+      const userFound = await prisma.user.update({
+        where: {
+          id: +checkoutSessionCompleted.metadata!.userId,
+        },
+        data: {
+          role: "suscriber",
+        },
+      });
 
-        const products = await prisma.product.findMany({
-          where: {
-            id: {
-              in: productsIds,
-            },
-          },
-        });
-
-        const total = products.reduce((acc, product) => acc + product.price, 0);
-
-        const newOrder = await prisma.order.create({
-          data: {
-            userId: parseInt(userId as string),
-            total,
-          },
-        });
-
-        await prisma.orderDetails.createMany({
-          data: products.map((product) => ({
-            orderId: newOrder.id,
-            productId: product.id,
-            price: product.price,
-            quantity: 1,
-          })),
-        });
-
-        // const newOrder = await prisma.order.create({
-        //   data:
-        // })
-      }
-
-      if (checkoutSessionCompleted.mode === "subscription") {
-        await prisma.user.update({
-          where: {
-            id: parseInt(checkoutSessionCompleted.metadata!.userId as string),
-          },
-          data: {
-            subscriptionId: checkoutSessionCompleted.subscription as string,
-          },
-        });
-      }
+      console.log('userFound desde webhook',{userFound})
 
       break;
-      // ... handle other event types
-      // case subscription canceled
-      // case "customer.subscription.deleted":
-      //   const subscriptionDeleted = event.data.object;
-
-      //   await prisma.user.update({
-      //     where: {
-      //       subscriptionId: subscriptionDeleted.id,
-      //       endDatePlan: "2024-06-06",
-      //       cancelado: true
-      //     },
-      //     data: {
-      //       subscriptionId: null,
-      //     },
-      //   });
-      break;
+    // aca puedo poner los eventos que necesite
     default:
       console.log(`Unhandled event type ${event.type}`);
+    //   }
   }
-
   return NextResponse.json({ received: true });
 }

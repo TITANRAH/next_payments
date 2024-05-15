@@ -78,7 +78,7 @@ function ProductForm({ categories }: Props) {
 
         {watch("image") instanceof FileList && watch("image") && (
           <Image
-            src={URL.createObjectURL(watch("image")[0] as any)}
+            src={URL.createObjectURL(watch("image")![0] as any)}
             alt="Product Image"
             className="w-20 h-20"
             width={80}

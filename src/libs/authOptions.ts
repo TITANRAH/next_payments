@@ -7,7 +7,9 @@ export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       credentials: {},
-      async authorize(credentials: any) {
+      async authorize(credentials: Record<never, string> | undefined) {
+
+        
         const { email, password } = credentials as {
           email: string;
           password: string;

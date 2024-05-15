@@ -1,0 +1,16 @@
+1 npm install 
+2 docker compose up -d
+3 configurar .env
+
+4 entre a cloydinary con github
+
+5 cuenta en stripe
+6 instalar sdk de stripe
+
+https://docs.stripe.com/libraries
+
+npm install stripe --save
+
+documentacion para desarolladores de stripe:
+esto lo tienen todos los procesadores de pago
+https://dashboard.stripe.com/test/developers 

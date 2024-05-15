@@ -1,0 +1,72 @@
+1. instalar sdk stripe
+2. crear la funcion checkout donde inicia todo
+3. en el archivo checkout route.ts 
+
+'use server'
+
+import { NextResponse } from "next/server";
+import Stripe from "stripe";
+
+
+const secretStripeKey = process.env.STRIPE_SECRET_KEY
+const stripe = new Stripe(secretStripeKey!);
+
+export async function POST() {
+  
+  // para comenzar creamos una sesion de cero, comenzando proceso de compra
+  stripe.checkout.sessions.create({
+
+  })
+  return NextResponse.json({pagado: true})
+}
+
+4. ver que moneads son soportadas https://docs.stripe.com/currencies
+5 . ver tarjetas que da opcion stripe https://docs.stripe.com/testing
+
+crear pago recurrente cuando es modo subscription 
+
+ir a stripe -> mas -> catalogo de producto -> añadir producto 
+
+una vez recibamos el checkout hay que usar bd 
+
+necesito crear un tunel para local no asi en produccion tunel que comunique a stripe con mi cliente ele evento de que alguien pago
+
+
+si tenemos un backend funcionando en un puerto ese puerto abro en puertos de vscode para el tunel
+
+este tunel sera una url que puedo cambiar a publico para que la vean desde otros lados
+
+luego voy a la cunta de strapi y busco desarrolladores y pongo la yrl en el webhoook mas la ruta donde debe llegar el evento de strapi
+
+luego elijo el evento que debe llegar a mi codigo en este caso checkot completed
+
+eso me da un codigo al lado derecho y lo copio para llevarlo a la ruta en este caso api/webhook
+
+
+1. click en boton por ejem  suscribirse o comprar 
+2. se genero una session
+3. recibimos la url de cambio de pagina al ingreso de datos
+4. si todo va bien en cuanto al pago retorna o si cancela retorna
+5. usamos tunel de vscode tunel http para recibir esa respuessta en ambient de desarollo 
+6. cuand recibimos la respuesta a la url ingresada en la cuenta de stripe en este caso url generada por vscode tunel + /api/webhook 
+7. al llegar el retorno a la direccion a su vez llega a mi app a traves de esa url
+8. si llega el evento al webhook puedo realizar una serie de cosas como por ejem guardar data en bd 
+10. usando next auth puedo tomar la session y guardar el ingresado usando prisma 
+11. 
+
+
+click boton -> 
+orden de compra o generar session o checkout -> 
+el post retorna url redirecciona a la ventana de pago -> 
+si el usuario pago retorna a la vista succes -> 
+la vista de la ventana de pago retorna a nuestro webhook ->
+el status de la compra puede ser completado o pendiente -> 
+podemos decirle que en bd guarde que esta pendiente en un campo status o en el mismo rol por ejemplp mientras este procesando el pago ->
+y eso podemos leerlo en success ver si esta pendiente  o pagado ->
+
+asiganada en el post del checkout o si pone cancelar compra 
+retorna a productos -> 
+
+
+
+nota: no olvidar habilitar el puerto y hacerlo pyblico del webhook
