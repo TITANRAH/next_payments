@@ -5,14 +5,21 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export function CartList() {
+
+  // traigo el estado del carrito
   const cart = useCartStore((state) => state.cart);
+  // traigo el remove 
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const router = useRouter();
 
+  // traigo la sesion actual 
   const { data: session } = useSession();
+
+  console.log(session)
 
   return (
     <div>
+      {/* recorro el stado y lo muestro  */}
       {cart.map((product) => (
         <Card key={product.id}>
           <div className="flex justify-between">
@@ -27,6 +34,7 @@ export function CartList() {
               <p>{product.price}</p>
             </div>
             <div className="flex items-center">
+
               <Button onClick={() => removeFromCart(product)}>
                 Remove from cart
               </Button>
@@ -38,6 +46,8 @@ export function CartList() {
       <div className="flex justify-end">
         <Button
           onClick={async () => {
+
+            // si no esta autenticado envialo a login
             if (!session) {
               return router.push("/auth/login");
             }

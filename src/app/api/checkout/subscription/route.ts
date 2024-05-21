@@ -8,11 +8,15 @@ import { authOptions } from "@/libs/authOptions";
 const secretStripeKey = process.env.STRIPE_SECRET_KEY;
 const stripe = new Stripe(secretStripeKey!);
 
-export async function POST() {
+export async function POST(request: Request) {
+
+
+
 
   // OBTENER ID DE USUARIO
 
   const session = await getServerSession(authOptions)
+  const body = await request.json()
   console.log('session --->',{session});
 
   // necesita estar autenticado para realizar la operacion
@@ -20,7 +24,7 @@ export async function POST() {
     return NextResponse.json({
       error: 'Necesitas estar autenticado'
     }, {
-      status: 400
+      status: 401
     })
   }
   
@@ -33,7 +37,8 @@ export async function POST() {
     line_items: [
       {
         // este id me dio al crear el producto recurrente
-        price:"price_1PF3z5P7r8EoWfdm4dYhUJfq",
+        // pero ahora puedo tomar del body el id del prodcgto recurrecnte sleeccionado
+        price: body.priceId,
         // price_data: {
         //   currency: "usd",
         //   product_data: {

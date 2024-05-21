@@ -40,35 +40,57 @@
 // }
 // export default SuccessPage;
 
-import { redirect } from 'next/navigation'
-import Stripe from 'stripe'
+import { redirect } from "next/navigation";
+import Stripe from "stripe";
+import UpdateSession from "./update-session";
+import { getServerSession } from "next-auth";
+import prisma from "@/libs/prisma";
+import { authOptions } from "@/libs/authOptions";
 
 async function SuccessPage() {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
-  // como tengo dicho que vuelva a success cuando haga un pago 
-  // confirmo consultando neuvamente con el id de la session del checkout guardado anteriormente en el 
+  // como tengo dicho que vuelva a success cuando haga un pago
+  // confirmo consultando neuvamente con el id de la session del checkout guardado anteriormente en el
   // webhook por lo que puedo consultar si esta pagado o no
 
   // obtener id de base de datos
-  const sessionId = 'cs_test_a1rgKdrWBcA6I0Ot72xIbLc2amqY2FBiB4xzxLrLb27UcYx9iF4LYCxdSk'
-  
-  const result = await stripe.checkout.sessions.retrieve(sessionId)
+  const session = await getServerSession(authOptions);
 
-  if(result.payment_status === 'paid') {
-    redirect('/dashboard')
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session?.user.id,
+    },
+  });
+
+  const result = await stripe.checkout.sessions.retrieve(
+    user?.id_last_session!
+  );
+
+  if (!session) {
+    redirect("/login");
   }
 
-  console.log('result dede success consultando el ultimo pago', result)
+  console.log("subscriptio o payment ?? -->", result.mode);
+
+  if (result.mode === "payment" && result.payment_status === "paid") {
+  //  poner toast
+      redirect("/dashboard");
+  
+  }
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      
       <h1 className="text-4xl font-bold"> !Pago Exitoso</h1>
       <p className="text-lg"> Gracias por su compra</p>
+
+      {result.mode === "payment" ? (
+        <p>Redirigiendo a Dashboard...</p>
+      ) : (
+        <UpdateSession subscriptionId={user?.subscriptionId} />
+      )}
     </div>
-  )
+  );
 }
 
-export default SuccessPage
+export default SuccessPage;

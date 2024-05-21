@@ -15,6 +15,7 @@ Table User {
   orders Order [not null]
   Payments Payments [not null]
   subscriptionId String
+  id_last_session String
   SubscriptionPlan SubscriptionPlan
   subscriptionPlanId Int
 }

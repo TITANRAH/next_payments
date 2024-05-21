@@ -53,42 +53,63 @@
 //   }
 // }
 
-
-
 import { authOptions } from "@/libs/authOptions";
+import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+console.log(process.env.STRIPE_SECRET_KEY!);
+export async function POST(request: Request) {
 
-console.log(process.env.STRIPE_SECRET_KEY!)
-export async function POST(request: Request){
-
-  const session = await getServerSession(authOptions)
-
-  if(!session) {
-    return new Response(null, {
-      status: 401,
-    })
-  }
 
   try {
+    const session = await getServerSession(authOptions);
 
-    // este dato de id debe venir de bd
-    const result = await stripe.subscriptions.cancel("sub_1PGPZ9P7r8EoWfdm7dM3w0HQ")
-    console.log('result de cancel suscription', result)
-  
-    return new Response(null, {
-      status: 204,
-    })
+    if (!session) {
+      redirect("/login");
+    }
+    // traigo al usuario por la sesion
+    const user = await prisma.user.findUnique({
+      where: {
+        id: session.user.id,
+      },
+    });
+
+    // pregunto si tiene suscripcion si no respondon null y 401
+    if (!user?.subscriptionId) {
+      return new Response(null, {
+        status: 401,
+      });
+    }
+
+    // si tiene suscripcion la cancelo  
+     await stripe.subscriptions.cancel(
+      user?.subscriptionId
+    );
+    // console.log("result de cancel suscription", result);
+
+    // si cancela la suscripcion actualizo el dato pasando el suscription id a null
+    const userUpdate = await prisma.user.update({
+      where: {
+        id: session!.user.id,
+      },
+      data: {
+        subscriptionId: null,
+      },
+    });
+
+    console.log('userUpdate desde cancel backend', userUpdate);
+
+    return NextResponse.json(userUpdate);
   } catch (error) {
-    console.log(error)
+    console.log('error desde cancel backend ->', error);
 
     return new Response(null, {
-    
-      status: 400
-    })
+      status: 400,
+    });
   }
- 
 }

@@ -13,15 +13,15 @@ export function ButtonUnsubscribe() {
         const result = await fetch("/api/checkout/subscription/cancel", {
           method: "POST",
         });
-        console.log(result);
+        console.log('result cancel desde button unsuscribe', result);
         // const data = await result.json();
-
+          
         const resultUpdate = await update({
           subscriptionId: null,
         });
-        console.log(resultUpdate);
-
+        
         router.refresh();
+        console.log('result update', resultUpdate);
       }}
     >
       Cancel Subscription

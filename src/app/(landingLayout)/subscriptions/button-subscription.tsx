@@ -2,7 +2,16 @@
 import { Button } from "@/components/ui";
 import { useRouter } from "next/navigation";
 
-export function ButtonSubcription({ price }: any) {
+
+interface Props {
+  price: any
+}
+
+export function ButtonSubcription(props: Props) {
+
+  const {price} = props;
+
+  console.log({price})
   const router = useRouter();
   return (
     <Button
@@ -11,7 +20,10 @@ export function ButtonSubcription({ price }: any) {
           const result = await fetch("/api/checkout/subscription", {
             method: "POST",
             body: JSON.stringify({ priceId: price.id }),
+            cache: 'no-store'
           });
+
+          console.log('result desde buttonsuscribe', result)
           const data = await result.json();
 
           console.log(result.status);

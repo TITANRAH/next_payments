@@ -12,12 +12,15 @@ export const useCartStore = create<CartStore>()(
     (set) => ({
       cart: [],
       addToCart: (product) =>
+        // toma el estado actual del carro y le añade un producto 
         set((state) => ({ cart: [...state.cart, product] })),
+        // clasico filter para remover productos
       removeFromCart: (product) =>
         set((state) => ({
           cart: state.cart.filter((p) => p.id !== product.id),
         })),
     }),
+    // nombre al usar persist
     { name: "cartStore" }
   )
 );

@@ -1,15 +1,15 @@
-import CredentialsProvider from "next-auth/providers/credentials";
+import Credentials from "next-auth/providers/credentials";
+
 import prisma from "@/libs/prisma";
 import bcrypt from "bcrypt";
 import { AuthOptions } from "next-auth";
 
 export const authOptions: AuthOptions = {
   providers: [
-    CredentialsProvider({
-      credentials: {},
-      async authorize(credentials: Record<never, string> | undefined) {
-
-        
+    Credentials({
+    
+     
+      async authorize(credentials) {
         const { email, password } = credentials as {
           email: string;
           password: string;
@@ -55,6 +55,9 @@ export const authOptions: AuthOptions = {
 
       console.log({ user, trigger, session });
 
+      // triggger es una funcion que permite actualizar la session en front
+      // por loq ue en este caso el subscriptionId viene en null al principio, pero al
+      // pagar una subscription cambiara al dato que corresponde
       if (trigger === "update" && session.user) {
         token.user = {
           ...(token.user as any),

@@ -1,5 +1,3 @@
-"use client";
-
 // import { Stripe } from "stripe";
 // import { ButtonSubcription } from "./button-subscription";
 
@@ -223,26 +221,37 @@
 // }
 
 import { Button } from "@/components/ui";
+import { useRouter } from "next/navigation";
+import { ButtonSubcription } from "./button-subscription";
+import Stripe from "stripe";
 
-const Suscription = () => {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+const SuscriptionPage = async () => {
+  const result = await stripe.prices.list({
+    limit: 3,
+  });
+
+  console.log("products list desde subscriptions page --->", result.data);
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <Button
-        onClick={async () => {
-          const result = await fetch("/api/checkout/subscription", {
-            method: "POST",
-          });
+    <div className="flex flex-row gap-2 items-center justify-center h-screen">
+      {/* si tengo mas de 1 producto recurrente como una suscripcion como producto :
 
-          const data = await result.json()
-          window.location.href = data.url;
-
-          console.log(result)
-        }}
-      >
-        Pagar suscripion
-      </Button>
+       1 . puedo listarlos con stripe.prices.list puedo tomar el id de ese precio relacionado a un producto 
+       2 . voy a la pagina de stripe creo los productos 
+       3 . los listo 
+       4 . los muestro a travs del boton  le paso price que son un objeto de datos 
+       5 . al otro lado en el componente buttonSubscription leo el priceId 
+       6 . envio el id seleccionado en el body de la peticion http  
+       7 . en la funcion http le paso el body.priceId que le mande en la funcion desde el boton 
+       8 . me redirecciona hacia la vista del producto del id selecccionado
+       */}
+      {result.data.map((price) => (
+        <ButtonSubcription key={price.id} price={price} />
+      ))}
     </div>
   );
 };
 
-export default Suscription;
+export default SuscriptionPage;

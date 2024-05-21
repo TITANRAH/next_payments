@@ -42,6 +42,9 @@ interface Props {
 
 export default function LandingLayout({ children }: Props) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // llamo al arreglo del store cart,
+  // y saco el .lenght y obtengo la canitdad de pdoductos en el carro para pasarselo al badge
   const cart = useCartStore((state) => state.cart);
   console.log(cart);
 

@@ -9,12 +9,17 @@ export function ButtonSubscribe() {
   return (
     <Button
       onClick={async () => {
-        const result = await fetch("/api/checkout/subscription", {
-          method: "POST",
-        });
-        const data = await result.json();
 
-        window.location.href = data.url;
+        // console.log('hola')
+        // const result = await fetch("/api/checkout/subscription", {
+        //   method: "POST",
+        // });
+        // console.log('result', result)
+        // const data = await result.json();
+
+        // window.location.href = data.url;
+
+        router.push('/subscriptions')
       }}
     >
       Subscribe

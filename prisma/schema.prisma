@@ -24,10 +24,13 @@ model User {
   orders          Order[]
   Payments        Payments[]
   subscriptionId  String?
+  id_last_session String?
 
   SubscriptionPlan   SubscriptionPlan? @relation(fields: [subscriptionPlanId], references: [id])
   subscriptionPlanId Int?
 }
+
+
 
 // model UsersPlans 
 

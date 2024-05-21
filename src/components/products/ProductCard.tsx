@@ -13,6 +13,7 @@ interface Props {
 
 function ProductCard({ product }: Props) {
   const router = useRouter();
+  // llamo a la funcion que añade al carro
   const addToCart = useCartStore((state) => state.addToCart);
 
   return (
@@ -51,22 +52,22 @@ function ProductCard({ product }: Props) {
           <p className="text-base font-medium text-gray-900">{product.price}</p>
           <Button
             onClick={async () => {
-              // addToCart(product);
+              addToCart(product);
 
               // llamamos a la funcion creada en esta ruta
-            const result = await fetch('/api/checkout',{
-                method: 'POST'
-              })
-              // console.log('comprar')
+            // const result = await fetch('/api/checkout',{
+            //     method: 'POST'
+            //   })
+            //   // console.log('comprar')
 
-              const data = await result.json()
+            //   const data = await result.json()
 
-              window.location.href = data.url
+            //   window.location.href = data.url
 
-              console.log({data})
+            //   console.log({data})
             }}
           >
-            Comprar
+            Añadir al Carrito
           </Button>
         </div>
       </div>
