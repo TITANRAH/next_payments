@@ -76,3 +76,51 @@ suscripcion y checkout es de donde redirecciona segun loq eu vendamos se usa sus
 cuando trae el result de velta despues de pagar 
 
 podremos ver en el campo mode: si es suspscrition o es payment 
+
+
+
+para crear una empresa en ee uu y cobrar con stripe 
+
+para constituir la empresa
+stripe.com/es/atlas 
+
+luego tenienedo la empresa constituida puedo usar esta empresa para psar a modo de prod en stripe 
+y puedo utilizar multiples proyectos con estos unicos datos de la emrpesa creada 
+
+con estos pagas los impuestos 
+https://www.greenbacktaxservices.com/
+
+con los dtos de la empresa constituida 
+Mercury es un neo banco y todo es digital puedes tener una cuenta aun que no vivas en ee uu
+
+stripe elements para estilizar botones de pago o forms
+
+PAYPAL
+
+paquete de backend: 
+
+instalar sdk https://www.npmjs.com/package/@paypal/checkout-server-sdk
+
+npm i @paypal/checkout-server-sdk
+
+para los types en server:
+npm i @types/paypal__checkout-server-sdk -D
+
+paquete de frontend: 
+
+https://www.npmjs.com/package/@paypal/react-paypal-js
+
+npm i @paypal/react-paypal-js
+
+pnemos el boton de paypal cart cart-list
+
+primero me logeo en mi cuenta de paypal
+https://www.paypal.com/myaccount
+
+luego entro a developer y creo la app
+https://developer.paypal.com/
+
+tomamos el client id de la app creada y lo lleamo a env 
+
+
+

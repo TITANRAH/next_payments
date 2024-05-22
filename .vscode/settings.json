@@ -1,4 +1,9 @@
 {
     "console-ninja.captureFunctions": false,
-    "console-ninja.output.showErrors": false
+    "console-ninja.output.showErrors": false,
+    "console-ninja.toolsToEnableSupportAutomaticallyFor": {
+        "live-server-extension": true,
+        "live-preview-extension": true
+    },
+    "console-ninja.output.showNetworkRequests": false
 }

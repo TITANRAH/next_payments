@@ -3,6 +3,7 @@ import { Card, Button } from "@/components/ui";
 import { useCartStore } from "@/store/cartStore";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import PayPalButton from "./paypal-button";
 
 export function CartList() {
 
@@ -63,6 +64,10 @@ export function CartList() {
         >
           Pagar {cart.reduce((acc, p) => acc + p.price, 0)} $
         </Button>
+
+        <PayPalButton/>
+
+      
       </div>
     </div>
   );

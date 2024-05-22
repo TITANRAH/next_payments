@@ -26,7 +26,7 @@ export function ButtonSubcription(props: Props) {
           console.log('result desde buttonsuscribe', result)
           const data = await result.json();
 
-          console.log(result.status);
+          console.log(result);
           if (result.status === 401) {
             return router.push("/auth/login");
           }
