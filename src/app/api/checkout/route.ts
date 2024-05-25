@@ -96,6 +96,10 @@ export async function POST(request: Request) {
   );
 
   console.log('id session', session?.user?.id!);
+
+  if(!session) {
+    return NextResponse.json({error: 'Unauthorized'}, {status: 400})
+  }
   
 
   // para comenzar creamos una sesion de cero, comenzando proceso de compra

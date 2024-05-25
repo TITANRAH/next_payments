@@ -122,5 +122,37 @@ https://developer.paypal.com/
 
 tomamos el client id de la app creada y lo lleamo a env 
 
+a parte de una prueba sandbox  necsitamos usuarios sandbox
+
+testing and tools -> sandbox accounts 
+
+puedo editar contraseña y correo 
+
+tomo ese correo y pago con en el popup de paypal
+
+con este correo puedo loguearme en paypal sandbox como si fuese un correo real 
+
+es la cuenta de pryeba de un usuario sandbox que compra
+https://www.sandbox.paypal.com/signin
+
+de vendedor es la misma pero con las credenciales que entrega la app creada en modo prueba 
+en este caso este correo sb-2imeu16741185@business.example.com vendedor sandbox
+
+
+proceso:
+
+hago las instalaciones
+
+pongo el boton 
+
+llamo al carro 
+
+paso los id de producto 
+
+en el backend llamo a prisma y traigo los productos relacionados a esos ids 
+
+le paso en el campo que necestia paypal los precios de los productos 
+
+
 
 
