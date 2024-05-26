@@ -65,80 +65,100 @@ const secretStripeKey = process.env.STRIPE_SECRET_KEY;
 const stripe = new Stripe(secretStripeKey!);
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
+  try {
+    const session = await getServerSession(authOptions);
 
-  // const session = await getServerSession(authOptions);
+    // const session = await getServerSession(authOptions);
 
-  // lo que disparo desde pagar en la page de carrito llega aca por lo tanto llega el arreglo de carrito
-  const data = await request.json();
-  console.log({ data });
+    // lo que disparo desde pagar en la page de carrito llega aca por lo tanto llega el arreglo de carrito
+    const data = await request.json();
+    console.log({ data });
 
-  // tomo los ids de este arreglo de carrito
-  const productsId = await data.map((p: any) => p.id);
+    // tomo los ids de este arreglo de carrito
+    const productsId = await data.map((p: any) => p.id);
 
-  console.log({ productsId });
-  // ahora traigo todos los productos de bd  en base a los ids encontrados
+    console.log({ productsId });
+    // ahora traigo todos los productos de bd  en base a los ids encontrados
 
-  const products = await prisma.product.findMany({
-    where: {
-      id: {
-        in: productsId,
-      },
-    },
-  });
-
-  // recorre con rdeuce cada elemento y ve sumando sus precios partiendo de 0 por cada iteracion sumara un valor
-  // se ira acomnlando las iteraciones dependen de cuantos elementos traiga products
-  // TAMBIEN PUEDO RECORRER EL ARREGLO EN EL MISMO CHECKOUT
-  const totalPrice = await products.reduce(
-    (acc, product) => acc + product.price,
-    0
-  );
-
-  console.log('id session', session?.user?.id!);
-
-  if(!session) {
-    return NextResponse.json({error: 'Unauthorized'}, {status: 400})
-  }
-  
-
-  // para comenzar creamos una sesion de cero, comenzando proceso de compra
-  // esta funcion llama al darle a comprar
-  const result = await stripe.checkout.sessions.create({
-  
-    // medio de pago
-    payment_method_types: ["card"],
-    metadata: {
-      'userId': session?.user?.id!,
-      'productsIds': productsId.join(',')
-    },
-    line_items: [
-      ...products.map((product) => ({
-        price_data: {
-          // currency: "clp",
-          currency: "usd",
-
-          product_data: {
-            name: product.name,
-          },
-
-          // 2000 centavos son 20 dolare
-          unit_amount: product.price * 100,
+    const products = await prisma.product.findMany({
+      where: {
+        id: {
+          in: productsId,
         },
-        quantity: 1,
-      })),
-    ],
-    // estos parametros som para saber donde tiene que volver los arreglos en aso de exito o de cancelar
-    success_url: "http://localhost:3000/success",
-    cancel_url: "http://localhost:3000/cart",
-    mode: "payment",
-    // metadata: {
-    //   "userId": session?.user.id!
-    // }
-  });
+      },
+    });
 
-  // al ver el result el campo url es el que nos importa de la devolucion
-  console.log("result desde route checkout", result );
+    // recorre con rdeuce cada elemento y ve sumando sus precios partiendo de 0 por cada iteracion sumara un valor
+    // se ira acomnlando las iteraciones dependen de cuantos elementos traiga products
+    // TAMBIEN PUEDO RECORRER EL ARREGLO EN EL MISMO CHECKOUT
+    // const totalPrice = await products.reduce(
+    //   (acc, product) => acc + product.price,
+    //   0
+    // );
 
-  return NextResponse.json({ url: result.url });
+    const productsWithQuantity = products.map((product) => {
+      const productInCart = data.find((p: any) => p.id === product.id);
+      return {
+        ...product,
+        quantity: productInCart.quantity,
+      };
+    });
+
+    console.log(productsWithQuantity);
+
+    console.log("id session", session?.user?.id!);
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 400 });
+    }
+
+    // para comenzar creamos una sesion de cero, comenzando proceso de compra
+    // esta funcion llama al darle a comprar
+    const result = await stripe.checkout.sessions.create({
+      // medio de pago
+      payment_method_types: ["card"],
+      metadata: {
+        userId: session?.user?.id!,
+        products: JSON.stringify(
+          productsWithQuantity.map((product) => ({
+            id: product.id,
+            quantity: product.quantity,
+          }))
+        ),
+      },
+      line_items: [
+        ...products.map((product) => ({
+          price_data: {
+            // currency: "clp",
+            currency: "usd",
+
+            product_data: {
+              name: product.name,
+            },
+
+            // 2000 centavos son 20 dolare
+            unit_amount: product.price * 100,
+          },
+          // del product co cantidad si existe coincidir y tomar quantity
+          quantity: productsWithQuantity.find((p) => p.id === product.id)
+            ?.quantity,
+        })),
+      ],
+      // estos parametros som para saber donde tiene que volver los arreglos en aso de exito o de cancelar
+      success_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cart",
+      mode: "payment",
+      // metadata: {
+      //   "userId": session?.user.id!
+      // }
+    });
+
+    // al ver el result el campo url es el que nos importa de la devolucion
+    console.log("result desde route checkout", result);
+
+    return NextResponse.json({ url: result.url });
+  } catch (error) {
+    console.log({ error });
+    return NextResponse.json({ error: "Error" }, { status: 400 });
+  }
 }

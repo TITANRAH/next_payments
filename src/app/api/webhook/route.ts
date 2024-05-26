@@ -40,30 +40,36 @@ export async function POST(req: Request) {
       );
 
       if (checkoutSessionCompleted.mode === "payment") {
-
-        if(checkoutSessionCompleted.payment_status === 'paid') {
-
-          console.log('entro al payment')
+        if (checkoutSessionCompleted.payment_status === "paid") {
+          console.log("entro al payment");
           // que usuaruo esta pegando?
-          // esta data se la envie en el pago en los campos de metadata al crear la compra 
+          // esta data se la envie en el pago en los campos de metadata al crear la compra
           console.log(checkoutSessionCompleted.metadata!.userId);
           const userId = checkoutSessionCompleted.metadata!.userId;
-  
+          // lo convierto el string en arreglo al parsearlo
+          const productsCheck = JSON.parse(
+            checkoutSessionCompleted.metadata!.products
+          );
+
           // ids de producto
-          console.log(checkoutSessionCompleted.metadata!.productsIds);
-  
+          console.log(checkoutSessionCompleted.metadata!.products);
+
           // saco los ids de la metadata del checkoyt y los separo por ,
-          const productsIds = checkoutSessionCompleted
-            .metadata!.productsIds.split(",")
-            .map((id) => +id);
-  
+          // const productsIds = checkoutSessionCompleted
+          //   .metadata!.products.split(",")
+          //   .map((id) => +id);
+
+          // console.log(productsIds)
+
           // busco al usuario con el id que viene en la metadata
           const userFound = await prisma.user.findUnique({
             where: {
               id: +userId!,
             },
           });
-  
+
+          console.log(userFound);
+
           // si no hay usuario devuelve un error
           if (!userFound) {
             return NextResponse.json(
@@ -79,47 +85,74 @@ export async function POST(req: Request) {
               id: userFound.id,
             },
             data: {
-              id_last_session: checkoutSessionCompleted.id
+              id_last_session: checkoutSessionCompleted.id,
             },
           });
-  
+
           // primero buscamos los productos en la tabla productos con los ids que trae el checkout
-  
-          const products = await prisma.product.findMany({
+
+          const productsDB = await prisma.product.findMany({
             where: {
               id: {
-                in: productsIds,
+                in: productsCheck.map((p: any) => p.id),
               },
             },
           });
-  
-          console.log({ products });
-  
+
+          console.log({ productsDB });
+
           // sumamos los precios de los productos que trae products encontrados con la metadata del checkout
-          const total = products.reduce((acc, product) => acc + product.price, 0);
-  
-          // creo la nueva orden en la tabla orden
+          const total = productsDB.reduce((acc: any, product: any) => {
+            const productInCart = productsCheck.find(
+              (p: any) => p.id === product.id
+            );
+
+            return acc + product.price * productInCart.quantity;
+          }, 0);
+
+          console.log(total);
+          // creo la nueva orden en la tabla ordenz
           const newOrder = await prisma.order.create({
             data: {
               userId: +userId!,
-              total: total,
+              total,
             },
           });
-  
+
           // aca lo que hace es generar en bd las filas una por una de los productos a comprar
           await prisma.orderDetails.createMany({
-            data: products.map((product) => ({
+            data: productsDB.map((product: any) => ({
               orderId: newOrder.id,
               productId: product.id,
               price: product.price,
-              quantity: 1,
+              // productsCheck es la metadata del carrito que se envio y llego aca al webhook
+              // estos productosCcheck traen la cantidad entonces si
+              // un producto de productscheck coincicde con un producto encontrado en bd
+              // guarda la cantidad en orderdetailes
+              quantity: productsCheck.find((p: any) => p.id === product.id)
+                ?.quantity,
             })),
           });
-  
+
+          // reducir stock
+          // tomo los productos que vienen de metadata productschcek
+          // los recorro y digo que actualizo cada producto id y hago un decrement en el Campo
+          // quantity
+          for (const product of productsCheck) {
+            await prisma.product.update({
+              where: {
+                id: product.id,
+              },
+              data: {
+                stock: {
+                  decrement: product.quantity,
+                },
+              },
+            });
+          }
+
           console.log("nueva orden desde webookh", newOrder);
         }
-
-       
 
         // await prisma.order.update({
         //   where: {
@@ -134,8 +167,10 @@ export async function POST(req: Request) {
       }
 
       if (checkoutSessionCompleted.mode === "subscription") {
-
-        console.log('entro al suscription', checkoutSessionCompleted?.subscription!.toString())
+        console.log(
+          "entro al suscription",
+          checkoutSessionCompleted?.subscription!.toString()
+        );
 
         // si el mode lelga como subscription cambio el rol
         // encuentra al usuario y actualiza su rol ya que pago ahora su rol es suscriptor no user
@@ -146,7 +181,7 @@ export async function POST(req: Request) {
           },
           data: {
             subscriptionId: checkoutSessionCompleted?.subscription!.toString(),
-            id_last_session: checkoutSessionCompleted.id
+            id_last_session: checkoutSessionCompleted.id,
           },
         });
 
