@@ -10,14 +10,16 @@ Table User {
   password String [not null]
   confirmed_email Boolean [default: false]
   role String [default: 'user']
+  subscriptionProvider String
   created_at DateTime [default: `now()`, not null]
   products Product [not null]
   orders Order [not null]
   Payments Payments [not null]
   subscriptionId String
+  status String
   id_last_session String
-  SubscriptionPlan SubscriptionPlan
-  subscriptionPlanId Int
+  startedAt DateTime
+  UsersSubscriptions Int
 }
 
 Table SubscriptionPlan {
@@ -26,7 +28,6 @@ Table SubscriptionPlan {
   description String [not null]
   price Float [not null]
   created_at DateTime [default: `now()`, not null]
-  users User [not null]
 }
 
 Table Category {
@@ -97,8 +98,6 @@ Table OrderToProduct {
   ordersId Int [ref: > Order.id]
   productsId Int [ref: > Product.id]
 }
-
-Ref: User.subscriptionPlanId > SubscriptionPlan.id
 
 Ref: Product.authorId > User.id
 

@@ -133,6 +133,8 @@ tomo ese correo y pago con en el popup de paypal
 con este correo puedo loguearme en paypal sandbox como si fuese un correo real 
 
 es la cuenta de pryeba de un usuario sandbox que compra
+testpersonal@personal123.com
+Tit@n123
 https://www.sandbox.paypal.com/signin
 
 de vendedor es la misma pero con las credenciales que entrega la app creada en modo prueba 
@@ -154,5 +156,33 @@ en el backend llamo a prisma y traigo los productos relacionados a esos ids
 le paso en el campo que necestia paypal los precios de los productos 
 
 
+usando api d paypal 
 
+https://developer.paypal.com/api/rest/
+
+usando postman y las apisde paypal
+
+el authorization tiee un post que genera el token por cierto tiempo
+
+
+command alt V de json a typescript
+
+
+
+puedo crear un producto ejem : 'tutorial x' 
+
+puedo crear un plan o varios planes a partir del id del producfo creado 
+
+puedo crear una subscripcion a un plan
+
+
+documentacion oficial: developer.paypal.com/api/rest/
+
+
+
+npx prisma migrate dev --name paypal_subscriptions
+
+para agreagr webjhook en paypal ir a la cuenta original en est caso gran rah 
+buscar el pryecto creado pinchar añadoir webhook y pone rla url del puerto e este caso 
+de desarollo local cambiar cuando es prod
 

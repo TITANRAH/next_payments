@@ -182,6 +182,7 @@ export async function POST(req: Request) {
           data: {
             subscriptionId: checkoutSessionCompleted?.subscription!.toString(),
             id_last_session: checkoutSessionCompleted.id,
+            subscriptionProvider: 'stripe'
           },
         });
 
