@@ -94,13 +94,16 @@ model ProductCategory {
 }
 
 model Payments {
-  id     Int   @id @default(autoincrement())
-  total  Float
-  user   User  @relation(fields: [userId], references: [id])
-  userId Int
+  id            Int    @id @default(autoincrement())
+  total         Float
+  user          User   @relation(fields: [userId], references: [id])
+  userId        Int
+  status_payment String? @default("NULL")
+  order         Order? @relation(fields: [orderId], references: [id])
+  orderId       Int? // id de laorden de stripe, paypal
 
-  order   Order @relation(fields: [orderId], references: [id])
-  orderId Int
+  paymentId Int? // id de pago de mercado pago
+  provider  String? // strope, paypañ, mercadopago
 
   created_at DateTime @default(now())
 }

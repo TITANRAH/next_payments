@@ -1,0 +1,81 @@
+voy a https://www.mercadopago.cl/developers 
+
+creo una cuenta de test vendedor y comprador  y creo una app para prod
+
+en esa cuenta test creo una nueva app de pruebas
+
+
+
+instalo el paquete 
+
+https://www.npmjs.com/package/mercadopago
+
+
+COPIAR CODIGO DE NPM PARA INICIAR MERCADO PAGO
+
+usar credenciales de produccion de la cuenta de prueba las crendiales de prueba dan error
+
+cuenta prueba
+test_user_1358258682@testuser.com
+k3MywJP6yR
+
+
+vendedor
+TESTUSER1387668434
+PYi8H2qNMj
+
+
+comprador
+TESTUSER968814099
+uUU11wkA9K
+
+
+PREFERENCIAS EN MERCADO PAGO
+
+https://www.mercadopago.cl/developers/es/docs/checkout-pro/checkout-customization/preferences
+
+para convertir monedas usar api 
+
+https://www.iban.com/currency-converter-api
+
+
+al ir a la cuenta a rescatar cuentas de pruebas y tarjetas de prueba 
+
+me sale una lista de cuentas que puedo usar para pagar cojn cualquier nombre
+
+y a su vez abajo en los cuadros me salen nombres y claves para probar distintos estados de pago 
+
+por ejem APRO, pago aprobado, OTHE, reachazado por error general etc 
+
+https://www.mercadopago.cl/developers/panel/app/861670754551764/test-cards
+
+Mastercard
+5416 7526 0258 2580
+
+123
+11/25
+Visa
+4168 8188 4444 7115
+123
+11/25
+American Express
+3757 781744 61804
+1234
+11/25
+
+otro
+12345678
+
+
+para el webhook igualmente  que stripe para prueba abrir ppuerto y poner la url en webhook url de prueba 
+esto en la app creada en mercado pago
+
+https://www.mercadopago.cl/developers/es/docs/your-integrations/notifications/webhooks
+
+
+para subscripciones en mercado pago 
+
+https://www.mercadopago.cl/developers/es/docs/subscriptions/integration-configuration/subscription-associated-plan
+
+
+npx prisma migrate dev --name status 

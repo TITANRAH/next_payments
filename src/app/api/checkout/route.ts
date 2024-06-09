@@ -60,6 +60,7 @@ import Stripe from "stripe";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/libs/authOptions";
 import prisma from "@/libs/prisma";
+import { redirect } from "next/navigation";
 
 const secretStripeKey = process.env.STRIPE_SECRET_KEY;
 const stripe = new Stripe(secretStripeKey!);
@@ -109,7 +110,9 @@ export async function POST(request: Request) {
     console.log("id session", session?.user?.id!);
 
     if (!session) {
+      
       return NextResponse.json({ error: "Unauthorized" }, { status: 400 });
+
     }
 
     // para comenzar creamos una sesion de cero, comenzando proceso de compra

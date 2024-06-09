@@ -98,7 +98,7 @@ export async function POST(request: Request) {
         id: session!.user.id,
       },
       data: {
-        subscriptionId: null,
+        subscriptionId: '',
       },
     });
 

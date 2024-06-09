@@ -70,6 +70,27 @@ export function CartList() {
         </Button>
 
         <PayPalButton />
+        <Button
+          className="bg-blue-500 hover:bg-blue-700"
+          onClick={async () => {
+
+            console.log('entro al boton de mercado pago en cart');
+            
+            const res = await fetch("/api/payments/mercadopago/checkout", {
+              method: "POST",
+              body: JSON.stringify(cart),
+            });
+
+            const data = await res.json()
+            console.log(res);
+            window.location.href = data.init_point
+          }}
+
+          // TESTUSER968814099
+          //uUU11wkA9K
+        >
+          Pagar con MercadoPago
+        </Button>
       </div>
     </div>
   );

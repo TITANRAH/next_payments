@@ -16,6 +16,13 @@ export async function POST() {
         "Content-Type": "application/json",
         'Authorization': `Bearer ${token}`,
       };
+
+      const body = {
+        name: 'Premium',
+        description: 'Premium Plan',
+        price: '10',
+        currency_code: 'USD'
+      }
   
       const response = await axios.post(
         `${process.env.PAYPAL_API_URL}/v1/billing/plans`,
@@ -23,8 +30,8 @@ export async function POST() {
 
             // EL PLAN ESTA DIRECTAMENTE RELACIONADO CON EL PRODUCTO QUE HAYA CREADO CON CREATE PLAN
             "product_id": "PROD-06157844DG5037121",
-            "name": "Fresh Clean Tees Plan",
-            "description": "Each shirt they send out to subscribers is designed with lots of attention to detail",
+            "name": body.name,
+            "description": body.description,
             "status": "ACTIVE",
             "billing_cycles": [
                 {
@@ -63,8 +70,8 @@ export async function POST() {
             "payment_preferences": {
                 "auto_bill_outstanding": true,
                 "setup_fee": {
-                    "value": "10",
-                    "currency_code": "USD"
+                    "value": body.price,
+                    "currency_code": body.currency_code
                 },
                 "setup_fee_failure_action": "CONTINUE",
                 "payment_failure_threshold": 3
