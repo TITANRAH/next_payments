@@ -85,43 +85,38 @@ export async function POST(request: NextRequest) {
   switch (payment.status_detail) {
     case "cc_rejected_insufficient_amount":
       console.log("entro al error de saldo insufciente");
-      NextResponse.json({
+      return NextResponse.json({
         message: "Algún dato de la tarjeta es inválido",
         status: 401,
       });
-      break;
 
     case "cc_rejected_bad_filled_other":
       console.log("entro al error cualquiera");
-      NextResponse.json({
+      return NextResponse.json({
         message: "Ocurrió un error inesperado",
         status: 401,
       });
-      break;
 
     case "cc_rejected_bad_filled_security_code":
       console.log("entro al error de código de seguridad");
-      NextResponse.json({
+      return NextResponse.json({
         message: "Código de seguridad erroneo",
         status: 401,
       });
-      break;
 
     case "cc_rejected_bad_filled_date":
       console.log("entro al error de fecha de vencimiento");
-      NextResponse.json({
+      return NextResponse.json({
         message: "Fecha de vencimiento erronea",
         status: 401,
       });
-      break;
 
     case "cc_rejected_bad_filled_card_number":
       console.log("entro al error de numero de tarjeta");
-      NextResponse.json({
+      return NextResponse.json({
         message: "Número de tarjeta erroneo",
         status: 401,
       });
-      break;
   }
 
   if (payment.status === "in_process") {
@@ -137,8 +132,19 @@ export async function POST(request: NextRequest) {
 
     console.log(userFound);
 
-    console.log(payment.id, payment.status,payment.transaction_amount);
-    
+    console.log(payment.id, payment.status, payment.transaction_amount);
+
+    const existePaymentId = await prisma.payments.findFirst({
+      where: {
+        paymentId: payment.id,
+      },
+    });
+
+    if (existePaymentId) {
+      return NextResponse.json("Payment existe no se volvera a grabar en bd", {
+        status: 201,
+      });
+    }
     const newPaymentRecordPending = await prisma.payments.create({
       data: {
         total: payment.transaction_amount!,
@@ -148,10 +154,10 @@ export async function POST(request: NextRequest) {
         status_payment: payment.status,
       },
     });
-
     console.log(newPaymentRecordPending);
 
-    return;
+      // CONSULTAR SI EL PAGO ESTA APROBADO POR PARTE DE MERCADO PAGO 
+    return NextResponse.json(newPaymentRecordPending);
   }
 
   //   actualizar el usuario en la bd y actualziar el esstado del pedido
